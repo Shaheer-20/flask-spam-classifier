@@ -1,34 +1,42 @@
 # Flask Email Spam Classifier 📧
 
-A web-based application built with Flask and Scikit-learn that classifies emails as "Spam" or "Ham" (Not Spam). This project features an interactive feedback loop, allowing the user to correct the model's predictions and retrain it on the fly, continuously improving its accuracy.
-
-## 🚀 Key Features
-
-* **Naive Bayes Classifier**: Utilizes the Multinomial Naive Bayes algorithm for fast and effective text classification.
-* **Prediction Confidence**: Displays a confidence score for each prediction, showing how certain the model is.
-* **Interactive UI**: A clean and simple user interface for testing new emails.
-* **Database Integration**: Stores every prediction in an SQLite database for review.
-* **Feedback Loop**: A dedicated review page where users can correct the model's mistakes.
-* **Live Retraining**: A one-click button to retrain the model using all the user-verified data, improving its intelligence over time.
+A dynamic web application built with Flask and Scikit-learn that classifies emails as **Spam** or **Ham** (Not Spam). This project features a powerful interactive feedback loop, allowing users to correct the model's predictions and retrain it on the fly, continuously improving its accuracy over time.
 
 ---
 
-## 🛠️ Technologies Used
+## ✨ Key Features
 
-* **Backend**: Python, Flask
-* **Machine Learning**: Scikit-learn
-* **Database**: SQLite with Flask-SQLAlchemy
-* **Frontend**: HTML, CSS
-* **Deployment**: (Ready for deployment on platforms like Heroku or PythonAnywhere)
+-   **Intelligent Classification**: Utilizes a Multinomial Naive Bayes classifier for fast and effective text analysis.
+-   **Confidence Score**: Displays the model's confidence level for each prediction, offering greater insight.
+-   **Continuous Learning**: Every email classified is stored in a database, creating an ever-growing dataset.
+-   **Interactive Feedback Loop**: A dedicated "Review" page allows you to correct the model's mistakes, turning it into a powerful teaching tool.
+-   **One-Click Retraining**: Retrain the model instantly with all the verified data you've provided, making it smarter with a single click.
+-   **Modern UI**: A clean, responsive, and user-friendly interface for a smooth experience.
+
+
 
 ---
 
-## ⚙️ Setup and Installation
+## 🛠️ Tech Stack
 
-Follow these steps to get the application running on your local machine.
+-   **Backend**: Python, Flask, Flask-SQLAlchemy
+-   **Machine Learning**: Scikit-learn, Pandas
+-   **Database**: SQLite
+-   **Frontend**: HTML, CSS
+
+---
+
+## ⚙️ Getting Started
+
+Follow these instructions to get a copy of the project up and running on your local machine.
+
+### Prerequisites
+
+-   Python 3.8+
+-   Git
 
 ### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/your-username/flask-spam-classifier.git](https://github.com/your-username/flask-spam-classifier.git)
+git clone [https://github.com/Shaheer-20/flask-spam-classifier.git](https://github.com/Shaheer-20/flask-spam-classifier.git)
 cd flask-spam-classifier
