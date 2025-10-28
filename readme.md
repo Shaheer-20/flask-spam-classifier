@@ -2,11 +2,6 @@
 
 A web-based application built with Flask and Scikit-learn that classifies emails as "Spam" or "Ham" (Not Spam). This project features an interactive feedback loop, allowing the user to correct the model's predictions and retrain it on the fly, continuously improving its accuracy.
 
-![Email Spam Classifier Screenshot](https://i.imgur.com/your-screenshot-url.png) 
-*(**Pro-tip:** Take a screenshot of your running application and upload it to a site like [imgur.com](https://imgur.com), then replace the URL above to showcase your project visually.)*
-
----
-
 ## 🚀 Key Features
 
 * **Naive Bayes Classifier**: Utilizes the Multinomial Naive Bayes algorithm for fast and effective text classification.
