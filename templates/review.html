@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review & Train</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Additional styles for the review page */
+        .email-review-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        .email-text {
+            white-space: pre-wrap; /* Preserves formatting */
+            background-color: #fff;
+            padding: 1rem;
+            border-radius: 5px;
+            border: 1px solid #eee;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .prediction-info {
+            font-style: italic;
+            color: #606770;
+            margin: 1rem 0;
+        }
+        .actions a {
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            margin-right: 10px;
+            color: #fff;
+            font-weight: bold;
+        }
+        .action-ham { background-color: #1e8e3e; }
+        .action-spam { background-color: #d93025; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 Review & Train Model</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form action="/retrain" method="post" style="margin-bottom: 2rem;">
+            <button type="submit">Retrain Model with Verified Data</button>
+        </form>
+
+        <hr>
+
+        <h2>Unverified Emails</h2>
+        {% if emails %}
+            {% for email in emails %}
+            <div class="email-review-card">
+                <h4>Email Text:</h4>
+                <div class="email-text">{{ email.text }}</div>
+                <div class="prediction-info">
+                    Model predicted: <strong>{{ email.predicted_label.upper() }}</strong>
+                </div>
+                <div class="actions">
+                    <span>This email is actually:</span>
+                    <a href="{{ url_for('verify', email_id=email.id, correct_label='ham') }}" class="action-ham">HAM</a>
+                    <a href="{{ url_for('verify', email_id=email.id, correct_label='spam') }}" class="action-spam">SPAM</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No new emails to review. Classify some emails on the main page first!</p>
+        {% endif %}
+
+        <a href="/" class="back-link">Back to Classifier</a>
+    </div>
+</body>
+</html>
