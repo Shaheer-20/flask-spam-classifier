@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Performance Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card { background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        .report-table { width: 100%; text-align: left; border-collapse: collapse; }
+        .report-table th, .report-table td { padding: 12px; border-bottom: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Model Performance Dashboard</h1>
+
+        <div class="metric-card">
+            <h2>Overall Accuracy</h2>
+            <p style="font-size: 2.5rem; font-weight: bold; color: #1877f2;">{{ "%.2f"|format(accuracy * 100) }}%</p>
+        </div>
+
+        <div class="metric-card">
+            <h2>Classification Report</h2>
+            <table class="report-table">
+                <tr>
+                    <th>Class</th><th>Precision</th><th>Recall</th><th>F1-Score</th><th>Support</th>
+                </tr>
+                {% for label, metrics in report.items() %}
+                    {% if label in ['ham', 'spam'] %}
+                    <tr>
+                        <td><strong>{{ label }}</strong></td>
+                        <td>{{ "%.2f"|format(metrics.precision) }}</td>
+                        <td>{{ "%.2f"|format(metrics.recall) }}</td>
+                        <td>{{ "%.2f"|format(metrics['f1-score']) }}</td>
+                        <td>{{ metrics.support }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
+
+        <div class="metric-card">
+            <h2>Confusion Matrix</h2>
+            <p>Shows how many predictions were correct vs. incorrect for each class.</p>
+            <canvas id="confusionMatrixChart" width="400" height="200"></canvas>
+        </div>
+
+        <a href="/" class="back-link">Back to Classifier</a>
+    </div>
+
+<script>
+    const ctx = document.getElementById('confusionMatrixChart').getContext('2d');
+    const confusionMatrixData = {{ confusion_matrix | tojson }};
+    const labels = {{ labels | tojson }};
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels, // True Labels on X-axis
+            datasets: [{
+                label: 'Predicted Ham',
+                data: [confusionMatrixData[0][0], confusionMatrixData[1][0]],
+                backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }, {
+                label: 'Predicted Spam',
+                data: [confusionMatrixData[0][1], confusionMatrixData[1][1]],
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Count' } },
+                x: { title: { display: true, text: 'True Class' } }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += context.parsed.y;
+                            const trueLabel = context.label;
+                            const predLabel = context.dataset.label.split(' ')[1];
+                            return `${context.parsed.y} emails were truly '${trueLabel}' but predicted as '${predLabel}'`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

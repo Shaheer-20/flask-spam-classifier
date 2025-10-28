@@ -1,4 +1,3 @@
-/* General Body Styles */
 body {
     font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     background-color: #f0f2f5;
@@ -8,134 +7,52 @@ body {
     min-height: 100vh;
     margin: 0;
     padding: 20px;
+    box-sizing: border-box;
 }
 
-/* Main Container */
 .container {
     background-color: #ffffff;
     padding: 2.5rem;
     border-radius: 12px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
     width: 100%;
-    max-width: 650px;
+    max-width: 700px;
     text-align: center;
     border: 1px solid #dddfe2;
 }
 
-/* Headings and Text */
-h1 {
-    font-size: 2rem;
-    color: #1877f2; /* A modern blue */
-    margin-bottom: 0.5rem;
-}
+h1 { font-size: 2rem; color: #1877f2; margin-bottom: 0.5rem; }
+p { color: #606770; margin-bottom: 2rem; font-size: 1.1rem; }
 
-p {
-    color: #606770;
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-/* Form Elements */
 textarea {
-    width: 100%;
-    padding: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccd0d5;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-    resize: vertical;
-    box-sizing: border-box; /* Important for padding */
+    width: 100%; padding: 15px; border-radius: 8px; border: 1px solid #ccd0d5;
+    margin-bottom: 1.5rem; font-size: 1rem; resize: vertical; box-sizing: border-box;
 }
 
-textarea:focus {
-    outline: none;
-    border-color: #1877f2;
-    box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
-}
+textarea:focus { outline: none; border-color: #1877f2; box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2); }
 
 button {
-    background-color: #1877f2;
-    color: white;
-    padding: 12px 30px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
+    background-color: #1877f2; color: white; padding: 12px 30px; border: none;
+    border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer;
     transition: background-color 0.3s ease, transform 0.1s ease;
 }
 
-button:hover {
-    background-color: #166fe5;
-    transform: scale(1.02);
-}
+button:hover { background-color: #166fe5; transform: scale(1.02); }
 
-/* Prediction Result Box */
-.result {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    border-radius: 8px;
-    font-size: 1.2rem;
-    border-left-width: 6px;
-    border-left-style: solid;
-}
+.result { margin-top: 2rem; padding: 1.5rem; border-radius: 8px; font-size: 1.2rem; border-left: 6px solid; }
+.result.spam { background-color: #fff0f0; color: #d93025; border-left-color: #d93025; }
+.result.ham { background-color: #e6f7f0; color: #1e8e3e; border-left-color: #1e8e3e; }
+.prediction-text { font-weight: 700; letter-spacing: 1px; }
 
-.result.spam {
-    background-color: #fff0f0;
-    color: #d93025;
-    border-left-color: #d93025;
-}
+.nav-links { margin-top: 2rem; display: flex; justify-content: center; gap: 20px; }
+.back-link { color: #1877f2; text-decoration: none; font-weight: 500; }
+.back-link:hover { text-decoration: underline; }
 
-.result.ham {
-    background-color: #e6f7f0;
-    color: #1e8e3e;
-    border-left-color: #1e8e3e;
-}
+.flash { padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; text-align: center; font-weight: 500; }
+.flash.success { background-color: #d4edda; color: #155724; }
+.flash.error { background-color: #f8d7da; color: #721c24; }
 
-.prediction-text {
-    font-weight: 700;
-    letter-spacing: 1px;
-}
-
-/* Link to Training Page */
-.back-link {
-    display: inline-block;
-    margin-top: 2rem;
-    color: #1877f2;
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.back-link:hover {
-    text-decoration: underline;
-}
-
-/* Flash Messages for Training */
-.flash {
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 500;
-}
-
-.flash.success {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.flash.error {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* File Input on Train Page */
-input[type="file"] {
-    margin-bottom: 1.5rem;
-    border: 2px dashed #ccd0d5;
-    padding: 2rem;
-    border-radius: 8px;
-    width: 100%;
-    cursor: pointer;
-    box-sizing: border-box;
-}
+.retrain-form { margin-bottom: 2rem; background: #f9f9f9; padding: 20px; border-radius: 8px; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+.form-group select { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd; }

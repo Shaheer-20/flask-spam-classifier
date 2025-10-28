@@ -1,15 +1,17 @@
 import os
 import pandas as pd
 import joblib
-from flask import Flask, render_template, request, flash, redirect, url_for
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
 
 # --- App and Database Configuration ---
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'a_very_secret_key'
-# Sets the database URI. The '///' means a relative path from the 'instance' folder.
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///classifier.db'
 db = SQLAlchemy(app)
 
@@ -18,7 +20,6 @@ class Email(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text, nullable=False)
     predicted_label = db.Column(db.String(10), nullable=False)
-    # The actual_label is what the user confirms. It can be null at first.
     actual_label = db.Column(db.String(10), nullable=True)
     verified = db.Column(db.Boolean, default=False, nullable=False)
 
@@ -29,13 +30,11 @@ def load_model_and_vectorizer():
         vectorizer = joblib.load('model/vectorizer.pkl')
         return model, vectorizer
     except FileNotFoundError:
-        # If no model exists, create a default one from the initial CSV
         print("Model not found. Training a new one from data/spam.csv...")
         initial_train()
         return joblib.load('model/spam_classifier_model.pkl'), joblib.load('model/vectorizer.pkl')
 
 def initial_train():
-    """Trains and saves an initial model from spam.csv."""
     df = pd.read_csv('data/spam.csv')
     vectorizer = CountVectorizer()
     X_counts = vectorizer.fit_transform(df['text'])
@@ -50,12 +49,10 @@ model, vectorizer = load_model_and_vectorizer()
 # --- Routes ---
 @app.route('/')
 def home():
-    """Renders the main page."""
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    """Predicts the label for an email and stores it in the database."""
     email_text = request.form.get('email_text')
     if not email_text:
         return render_template('index.html')
@@ -65,10 +62,12 @@ def predict():
     prediction = model.classes_[probabilities.argmax()]
     confidence = round(probabilities.max() * 100, 2)
 
-    # Save the prediction to the database for later review
     new_email = Email(text=email_text, predicted_label=prediction)
     db.session.add(new_email)
     db.session.commit()
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({'prediction': prediction, 'confidence': confidence})
 
     return render_template(
         'index.html',
@@ -79,13 +78,11 @@ def predict():
 
 @app.route('/review')
 def review():
-    """Shows all unverified emails for user feedback."""
     unverified_emails = Email.query.filter_by(verified=False).all()
     return render_template('review.html', emails=unverified_emails)
 
 @app.route('/verify/<int:email_id>/<string:correct_label>')
 def verify(email_id, correct_label):
-    """Marks an email as verified with the correct label."""
     email = Email.query.get_or_404(email_id)
     email.actual_label = correct_label
     email.verified = True
@@ -95,36 +92,69 @@ def verify(email_id, correct_label):
 
 @app.route('/retrain', methods=['POST'])
 def retrain():
-    """Retrains the model using all verified data from the database."""
-    global model, vectorizer # We need to update the global model objects
+    global model, vectorizer
+    model_choice = request.form.get('model_choice', 'naive_bayes')
 
     verified_emails = Email.query.filter_by(verified=True).all()
 
-    if len(verified_emails) < 10: # Set a reasonable minimum for retraining
+    if len(verified_emails) < 10:
         flash('Not enough verified emails to retrain. Please verify at least 10 emails.', 'error')
         return redirect(url_for('review'))
 
-    # Create a DataFrame from the database data
     data = {'text': [email.text for email in verified_emails],
             'label': [email.actual_label for email in verified_emails]}
     df = pd.DataFrame(data)
 
-    # Retrain vectorizer and model
-    vectorizer = CountVectorizer()
-    X_counts = vectorizer.fit_transform(df['text'])
-    model = MultinomialNB()
-    model.fit(X_counts, df['label'])
+    if model_choice in ['logistic_regression', 'svm']:
+        vectorizer = TfidfVectorizer()
+        if model_choice == 'logistic_regression':
+            model = LogisticRegression(max_iter=1000)
+        else:
+            model = LinearSVC(max_iter=1000, dual=True)
+    else:
+        vectorizer = CountVectorizer()
+        model = MultinomialNB()
 
-    # Save the new model
+    X_transformed = vectorizer.fit_transform(df['text'])
+    model.fit(X_transformed, df['label'])
+
     joblib.dump(model, 'model/spam_classifier_model.pkl')
     joblib.dump(vectorizer, 'model/vectorizer.pkl')
 
-    flash(f'Model successfully retrained with {len(verified_emails)} emails!', 'success')
+    flash(f'Model successfully retrained using {model.__class__.__name__}!', 'success')
     return redirect(url_for('review'))
+
+@app.route('/dashboard')
+def dashboard():
+    verified_emails = Email.query.filter_by(verified=True).all()
+
+    if len(verified_emails) < 2:
+        flash('Not enough verified data to build a dashboard. Please verify more emails.', 'error')
+        return redirect(url_for('review'))
+
+    true_labels = [email.actual_label for email in verified_emails]
+    texts = [email.text for email in verified_emails]
+    X_counts = vectorizer.transform(texts)
+    predictions = model.predict(X_counts)
+
+    accuracy = accuracy_score(true_labels, predictions)
+    try:
+        report = classification_report(true_labels, predictions, output_dict=True, zero_division=0)
+        cm = confusion_matrix(true_labels, predictions, labels=model.classes_).tolist()
+    except ValueError:
+        flash('Could not generate report. Ensure you have verified examples of both ham and spam.', 'error')
+        return redirect(url_for('review'))
+
+    return render_template(
+        'dashboard.html',
+        accuracy=accuracy,
+        report=report,
+        confusion_matrix=cm,
+        labels=model.classes_.tolist()
+    )
 
 # --- Main Execution ---
 if __name__ == '__main__':
     with app.app_context():
-        # This will create the database file and table if they don't exist
         db.create_all()
     app.run(debug=True)

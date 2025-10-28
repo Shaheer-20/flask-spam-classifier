@@ -6,37 +6,10 @@
     <title>Review & Train</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        /* Additional styles for the review page */
-        .email-review-card {
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-        .email-text {
-            white-space: pre-wrap; /* Preserves formatting */
-            background-color: #fff;
-            padding: 1rem;
-            border-radius: 5px;
-            border: 1px solid #eee;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .prediction-info {
-            font-style: italic;
-            color: #606770;
-            margin: 1rem 0;
-        }
-        .actions a {
-            text-decoration: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            margin-right: 10px;
-            color: #fff;
-            font-weight: bold;
-        }
+        .email-review-card { background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; text-align: left; }
+        .email-text { white-space: pre-wrap; background-color: #fff; padding: 1rem; border-radius: 5px; border: 1px solid #eee; max-height: 200px; overflow-y: auto; }
+        .prediction-info { font-style: italic; color: #606770; margin: 1rem 0; }
+        .actions a { text-decoration: none; padding: 8px 15px; border-radius: 5px; margin-right: 10px; color: #fff; font-weight: bold; }
         .action-ham { background-color: #1e8e3e; }
         .action-spam { background-color: #d93025; }
     </style>
@@ -53,7 +26,15 @@
           {% endif %}
         {% endwith %}
 
-        <form action="/retrain" method="post" style="margin-bottom: 2rem;">
+        <form action="/retrain" method="post" class="retrain-form">
+            <div class="form-group">
+                <label for="model_choice">Choose an algorithm to train:</label>
+                <select name="model_choice" id="model_choice">
+                    <option value="naive_bayes">Multinomial Naive Bayes</option>
+                    <option value="logistic_regression">Logistic Regression</option>
+                    <option value="svm">Support Vector Machine (SVM)</option>
+                </select>
+            </div>
             <button type="submit">Retrain Model with Verified Data</button>
         </form>
 
@@ -79,7 +60,10 @@
             <p>No new emails to review. Classify some emails on the main page first!</p>
         {% endif %}
 
-        <a href="/" class="back-link">Back to Classifier</a>
+        <div class="nav-links">
+             <a href="/" class="back-link">Back to Classifier</a>
+             <a href="/dashboard" class="back-link">View Performance</a>
+        </div>
     </div>
 </body>
 </html>

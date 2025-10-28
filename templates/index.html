@@ -15,14 +15,48 @@
             <button type="submit">Classify Email</button>
         </form>
 
-        {% if prediction %}
-        <div class="result {{ 'spam' if prediction == 'spam' else 'ham' }}">
-            <h2>Prediction: <span class="prediction-text">{{ prediction.upper() }}</span></h2>
-            <p><strong>Confidence: {{ confidence }}%</strong></p>
+        <div id="result-container">
+            {% if prediction %}
+            <div class="result {{ 'spam' if prediction == 'spam' else 'ham' }}">
+                <h2>Prediction: <span class="prediction-text">{{ prediction.upper() }}</span></h2>
+                <p><strong>Confidence: {{ confidence }}%</strong></p>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
 
-        <a href="/review" class="back-link">Review Predictions & Train Model</a>
+        <div class="nav-links">
+            <a href="/review" class="back-link">Review & Train Model</a>
+            <a href="/dashboard" class="back-link">View Performance</a>
+        </div>
     </div>
+
+<script>
+    const form = document.querySelector('form');
+    const resultContainer = document.getElementById('result-container');
+
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Stop the default page reload
+
+        const formData = new FormData(form);
+        const response = await fetch('/predict', {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest' // Identify this as an AJAX request
+            },
+            body: formData
+        });
+
+        const result = await response.json(); // Get the JSON response
+
+        // Dynamically update the result div
+        const predictionClass = result.prediction === 'spam' ? 'spam' : 'ham';
+        resultContainer.innerHTML = `
+            <div class="result ${predictionClass}">
+                <h2>Prediction: <span class="prediction-text">${result.prediction.toUpperCase()}</span></h2>
+                <p><strong>Confidence: ${result.confidence}%</strong></p>
+            </div>
+        `;
+    });
+</script>
 </body>
 </html>
