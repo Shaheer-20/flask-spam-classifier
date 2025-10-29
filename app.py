@@ -36,7 +36,7 @@ def load_model_and_vectorizer():
 
 def initial_train():
     df = pd.read_csv('data/spam.csv')
-    vectorizer = CountVectorizer()
+    vectorizer = CountVectorizer(stop_words='english')
     X_counts = vectorizer.fit_transform(df['text'])
     model = MultinomialNB()
     model.fit(X_counts, df['label'])
@@ -106,13 +106,13 @@ def retrain():
     df = pd.DataFrame(data)
 
     if model_choice in ['logistic_regression', 'svm']:
-        vectorizer = TfidfVectorizer()
+        vectorizer = TfidfVectorizer(stop_words='english')
         if model_choice == 'logistic_regression':
             model = LogisticRegression(max_iter=1000)
         else:
             model = LinearSVC(max_iter=1000, dual=True)
     else:
-        vectorizer = CountVectorizer()
+        vectorizer = CountVectorizer(stop_words='english')
         model = MultinomialNB()
 
     X_transformed = vectorizer.fit_transform(df['text'])

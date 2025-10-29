@@ -16,7 +16,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # 4. Feature Extraction (Convert text to numerical data)
 # We use CountVectorizer to convert email text into a matrix of token counts.
-vectorizer = CountVectorizer()
+vectorizer = CountVectorizer(stop_words='english')
 X_train_counts = vectorizer.fit_transform(X_train)
 X_test_counts = vectorizer.transform(X_test)
 
